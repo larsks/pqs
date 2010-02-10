@@ -12,10 +12,13 @@ And this as three tokens::
 
   this "is a" test
 
+By default it understands about double-quoted and single-quoted substrings,
+but you can teach it about others.
+
 Example: Parsing Apache logs
 ============================
 
-Apaches "combined" log format generates lines that look something like
+Apache's "combined" log format generates lines that look something like
 this::
 
   10.100.100.100 - guest [10/Feb/2010:12:12:07 -0500] "GET /foo HTTP/1.0"
