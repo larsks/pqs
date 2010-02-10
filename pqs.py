@@ -34,8 +34,9 @@ class Parser (object):
         if not self._acc:
             return
 
-        self._tokens.append((self._qp, ''.join(self._acc)))
+        text = ''.join(self._acc)
         self._acc = []
+        return (self._qp, text)
 
     def _newstate(self, state, qp):
         self._state = state
@@ -53,27 +54,34 @@ class Parser (object):
             try:
                 if self._state == 0:
                     if ch.isspace():
-                        self._dumpacc()
+                        tok = self._dumpacc()
+                        if tok:
+                            yield(tok)
                         continue
                     
                     for qp in self.quotechars:
                         if ch == qp[0]:
-                            self._dumpacc()
+                            tok = self._dumpacc()
+                            if tok:
+                                yield(tok)
                             self._newstate(1, qp)
 
                     self._acc.append(ch)
                 elif self._state == 1:
                     if ch == self._qp[1]:
                         # Found matching quote.
-                        self._dumpacc()
+                        tok = self._dumpacc()
+                        if tok:
+                            yield(tok)
                         self._newstate(0, None)
                     else:
                         self._acc.append(ch)
             except NewState:
                 pass
 
-        self._dumpacc()
-        return self._tokens
+        tok = self._dumpacc()
+        if tok:
+            yield(tok)
 
 def parse_args():
     p = optparse.OptionParser()
@@ -88,9 +96,9 @@ def  main():
         p.addchars(('[',']'))
 
     for line in sys.stdin:
-        parts = p.parse(line)
         print '=' * 70
-        print '\n'.join([str(x) for x in parts])
+        for tok in p.parse(line):
+            print str(tok)
 
 if __name__ == '__main__':
     main()
