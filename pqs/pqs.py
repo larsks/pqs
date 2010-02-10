@@ -39,6 +39,7 @@ class Parser (object):
 
     def _newstate(self, state, qp):
         self._state = state
+        self._tok = self._dumpacc()
         self._qp = qp
         raise NewState()
 
@@ -70,9 +71,8 @@ class Parser (object):
                     else:
                         self._acc.append(ch)
             except NewState:
-                tok = self._dumpacc()
-                if tok:
-                    yield(tok)
+                if self._tok:
+                    yield(self._tok)
 
         tok = self._dumpacc()
         if tok:
